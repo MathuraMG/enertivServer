@@ -1,3 +1,2 @@
-# Shop-ITP
-
-A graph looking at the usage tools in the shop at ITP now vs. at time of "Peak Usage"
+# enertiv server
+A custim made enertiv server to get the required data from enertiv into a phonegap app.
