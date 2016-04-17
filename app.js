@@ -49,8 +49,8 @@ app.get('/login', function (req,res){
 //  1) KITCHEN
 //  2) SHOP
 //  3) PCOMP
-//	4) CLASSROOMS
-//			a) ROOM 20
+//	4) CLASSROOMS - Room 20,15,50 Meeting room, Conf Room
+//
 //*****************************************
 
 //*****************************************
@@ -70,7 +70,8 @@ app.get('/kitchen', function (req,res){
 
 		var kitchenLocationId = 'efa01903-ca25-4501-9920-d34fa61de5e9';
 
-		equipmentObject.getEquipmentFromLocation(kitchenLocationId,res,c);
+		var locations = [kitchenLocationId];
+		equipmentObject.getEquipmentFromLocations(locations,res,c);
 
 	});
 });
@@ -93,7 +94,8 @@ app.get('/shop', function (req,res){
 
 		var shopLocationId = 'b121b9e6-44e6-40b3-b787-ee667bfa084d';
 
-		equipmentObject.getEquipmentFromLocation(shopLocationId,res,c);
+		var locations = [shopLocationId];
+		equipmentObject.getEquipmentFromLocations(locations,res,c);
 
 	});
 });
@@ -114,7 +116,8 @@ app.get('/physComp', function (req,res){
 		clientData.uuid = clientInfo[0].id;
 
 		var physCompLocationId = 'ce007293-7a34-4a61-80a1-d92312e6cfa9';
-		equipmentObject.getEquipmentFromLocation(physCompLocationId,res,c);
+		var locations = [physCompLocationId];
+		equipmentObject.getEquipmentFromLocations(locations,res,c);
 
 	});
 });
@@ -124,7 +127,7 @@ app.get('/physComp', function (req,res){
 // 					CLASSROOM -ROOM 20
 //
 //*****************************************
-app.get('/room20', function (req,res){
+app.get('/classrooms', function (req,res){
 
 	//console.log('potato');
 
@@ -135,95 +138,22 @@ app.get('/room20', function (req,res){
 		clientData.uuid = clientInfo[0].id;
 
 		var room20LocationId = '2b9e3545-b62f-4b9f-9053-254b99e14c9c';
-		equipmentObject.getEquipmentFromLocation(room20LocationId,res,c);
-
-	});
-});
-
-//*****************************************
-//
-// 					CLASSROOM -ROOM 15
-//
-//*****************************************
-app.get('/room15', function (req,res){
-
-	//console.log('potato');
-
-	var apiClient = c.apiCall('/api/client/', function (apiClient){
-
-		var clientInfo = JSON.parse(apiClient);
-		console.log(clientInfo);
-		clientData.uuid = clientInfo[0].id;
-
 		var room15LocationId = 'd0b102ee-e0a4-40f6-9795-ab8745f0ef33';
-		equipmentObject.getEquipmentFromLocation(room15LocationId,res,c);
-
-	});
-});
-
-//*****************************************
-//
-// 					CLASSROOM -ROOM 50
-//
-//*****************************************
-app.get('/room50', function (req,res){
-
-	//console.log('potato');
-
-	var apiClient = c.apiCall('/api/client/', function (apiClient){
-
-		var clientInfo = JSON.parse(apiClient);
-		console.log(clientInfo);
-		clientData.uuid = clientInfo[0].id;
-
 		var room50LocationId = '773eece8-c7c6-425a-9d4f-93a2c4954c66';
-		equipmentObject.getEquipmentFromLocation(room50LocationId,res,c);
-
-	});
-});
-
-//*****************************************
-//
-// 					CLASSROOM - MEETING ROOM
-//
-//*****************************************
-app.get('/meetingRoom', function (req,res){
-
-	//console.log('potato');
-
-	var apiClient = c.apiCall('/api/client/', function (apiClient){
-
-		var clientInfo = JSON.parse(apiClient);
-		console.log(clientInfo);
-		clientData.uuid = clientInfo[0].id;
-
 		var meetingRoomLocationId = '80a0c045-1f6e-4b8c-96a3-5d2865ea5f6e';
-		equipmentObject.getEquipmentFromLocation(meetingRoomLocationId,res,c);
-
-	});
-});
-
-
-//*****************************************
-//
-// 					CLASSROOM - CONF ROOM
-//
-//*****************************************
-app.get('/conferenceRoom', function (req,res){
-
-	//console.log('potato');
-
-	var apiClient = c.apiCall('/api/client/', function (apiClient){
-
-		var clientInfo = JSON.parse(apiClient);
-		console.log(clientInfo);
-		clientData.uuid = clientInfo[0].id;
-
 		var conferenceRoomLocationId = '4b6a1f2e-b40d-4cc6-8119-217259a75249';
-		equipmentObject.getEquipmentFromLocation(conferenceRoomLocationId,res,c);
+
+		var locations = [room20LocationId,
+															room15LocationId,
+															room50LocationId,
+															meetingRoomLocationId,
+															conferenceRoomLocationId]
+		equipmentObject.getEquipmentFromLocations(locations,res,c);
 
 	});
 });
+
+
 
 
 // Start our server
