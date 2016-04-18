@@ -89,9 +89,18 @@ module.exports = {
           var equipmentEnergy = [];
           var totalEnergyOffPeak = 0;
           var totalEnergyPeak = 0;
+          console.log('data length is -- ' + parsedData.data.length);
           for(var i =0;i<parsedData.data.length;i++)
           {
             equipmentEnergy[i] = {x:i,y:parsedData.data[i][keyName]*1000};
+            if(i%96<40)
+            {
+              totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+            }
+            else
+            {
+              totalEnergyPeak += parsedData.data[i][keyName]*1000;
+            }
 
             if(!totalRoomEnergy[i])
             {
@@ -103,7 +112,7 @@ module.exports = {
             }
 
           }
-          equipmentResponse.push({name:keyName,value: equipmentEnergy,totalEnergyOffPeak: 0, totalEnergyPeak: 0});
+          equipmentResponse.push({name:keyName,value: equipmentEnergy,totalEnergyOffPeak: totalEnergyOffPeak, totalEnergyPeak: totalEnergyPeak});
         }
 
       }
