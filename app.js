@@ -173,7 +173,7 @@ app.get('/classrooms', function (req,res){
 	//				Total floor energy
 	//
 	//*****************************************
-	app.get('/classrooms1', function (req,res){
+	app.get('/floordata_itp', function (req,res){
 
 		var apiClient = c.apiCall('/api/client/', function (apiClient){
 
@@ -184,41 +184,11 @@ app.get('/classrooms', function (req,res){
 			if(req.query.startTime)
 				{
 					var startTime = req.query.startTime;
-					var startTimeFormatted = startTime.toString().substring(0,19)+'Z';
 					var endTime = moment().format();
-					var endTimeFormatted = endTime.toString().substring(0,19)+'Z';
-					console.log('The time range is -- ' + startTimeFormatted + ' -- ' + endTimeFormatted );
-					floorObject.getFloorOverAllEnergy(startTimeFormatted, endTimeFormatted, location,c,res);
+					console.log('The time range is -- ' + startTime+ ' -- ' + endTime );
+					floorObject.getFloorOverAllEnergy(startTime, endTime, location,c,res);
 
 				}
-
-
-
-	//res.send('hi');
-
-		// var locationId;
-		// var apiClient = c.apiCall('/api/client/', function (apiClient){
-		// 	if(apiClient)
-		// 	{
-		// 	var clientInfo = JSON.parse(apiClient);
-		// 	if(clientInfo.locations[0])
-		// 		{
-		// 		console.log(clientInfo);
-		// 		locationId = clientInfo.locations[0];
-		// 		console.log(locationId);
-		// 		}
-		// 	}
-		//
-		// 	if(req.query.startTime)
-		// 	{
-		// 		var startTime = req.query.startTime;
-		// 		var startTimeFormatted = startTime.toString().substring(0,19)+'Z';
-		// 		var endTime = moment().format();
-		// 		var endTimeFormatted = endTime.toString().substring(0,19)+'Z';
-		// 		console.log('The time range is -- ' + startTimeFormatted + ' -- ' + endTimeFormatted );
-		//
-		// 	}
-		// 	res.send('hi');
 
 		});
 	});
