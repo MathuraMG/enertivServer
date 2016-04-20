@@ -69,7 +69,32 @@ module.exports = {
 
   getEquipmentData: function(index, equipmentId, c, equipmentResponse, noOfEquipments,res, startTimeFormatted, endTimeFormatted, totalRoomEnergy)
   {
+    var currTime = new Date();
+    var currentHour = currTime.getHours();
+    var currentMinute = currTime.getMinutes();
 
+    var diff;
+    var changeStart;
+    var changeEnd;
+    var changeDur;
+    var isDay;
+
+    if(currentHour >= 9 && currentHour <= 24 )
+    {
+      isDay = 1;
+      changeDur = 540; //indicates how long it is nighttime
+      diff = 1440 - ((currentHour-9)*60 + currentMinute);
+      changeEnd = 1440 - diff;
+      changeStart = changeEnd - changeDur;
+    }
+    else
+    {
+      isDay = 0;
+      changeDur = 900;  //indicates how long it is daytime
+      diff = 1440 - ((currentHour)*60 + currentMinute);
+      changeEnd = 1440 - diff;
+      changeStart = changeEnd - changeDur;
+    }
 	  var detailOfEquipmentUrl = '/api/equipment/' + equipmentId + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=min&cost=false';
 
     var equipmentData = c.apiCall(detailOfEquipmentUrl, function(equipmentData){
@@ -85,6 +110,7 @@ module.exports = {
         }
         else
         {
+
           console.log('obtaining data for -- ' + keyName );
           var equipmentEnergy = [];
           var totalEnergyOffPeak = 0;
@@ -93,13 +119,27 @@ module.exports = {
           for(var i =0;i<parsedData.data.length;i++)
           {
             equipmentEnergy[i] = {x:i,y:parsedData.data[i][keyName]*1000};
-            if(i%96<40)
+            if(isDay ==1)
             {
-              totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+              if(i>= changeStart && i< changeEnd)
+              {
+                totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+              }
+              else
+              {
+                totalEnergyPeak += parsedData.data[i][keyName]*1000;
+              }
             }
             else
             {
-              totalEnergyPeak += parsedData.data[i][keyName]*1000;
+              if(i>= changeStart && i< changeEnd)
+              {
+                totalEnergyPeak += parsedData.data[i][keyName]*1000;
+              }
+              else
+              {
+                totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+              }
             }
 
             if(!totalRoomEnergy[i])
@@ -126,7 +166,11 @@ module.exports = {
         var totalRoomEnergyOffPeak = 0;
         equipmentResponse.push({name:'roomTotal',value: totalRoomEnergy,totalEnergyOffPeak: totalRoomEnergyOffPeak, totalEnergyPeak: totalRoomEnergyPeak});
 
-        res.send(equipmentResponse);
+        res.send({
+          'data':equipmentResponse,
+          'isDay' : isDay,
+          'range' : [changeStart,changeEnd]
+        });
       }
       else{
 
