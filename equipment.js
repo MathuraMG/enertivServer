@@ -83,7 +83,7 @@ module.exports = {
     {
       isDay = 1;
       changeDur = 540; //indicates how long it is nighttime
-      diff = 1440 - ((currentHour-9)*60 + currentMinute);
+      diff = ((currentHour-9)*60 + currentMinute);
       changeEnd = 1440 - diff;
       changeStart = changeEnd - changeDur;
     }
@@ -91,7 +91,7 @@ module.exports = {
     {
       isDay = 0;
       changeDur = 900;  //indicates how long it is daytime
-      diff = 1440 - ((currentHour)*60 + currentMinute);
+      diff = ((currentHour)*60 + currentMinute);
       changeEnd = 1440 - diff;
       changeStart = changeEnd - changeDur;
     }
@@ -132,6 +132,7 @@ module.exports = {
             }
             else
             {
+
               if(i>= changeStart && i< changeEnd)
               {
                 totalEnergyPeak += parsedData.data[i][keyName]*1000;

@@ -1,7 +1,11 @@
 var express = require('express');
+var moment = require('moment');
 var client1 = require('./client.js');
 var cors = require('cors');
 var equipmentObject = require('./equipment.js');
+
+//FILE TO GET THE DATA ON ITP FLOOR GIVEN A TIME RANGE
+var floorObject = require('./floorData.js');
 
 var app = express();
 var c = new client1;
@@ -129,8 +133,6 @@ app.get('/physComp', function (req,res){
 //*****************************************
 app.get('/classrooms', function (req,res){
 
-	//console.log('potato');
-
 	var apiClient = c.apiCall('/api/client/', function (apiClient){
 
 		var clientInfo = JSON.parse(apiClient);
@@ -154,10 +156,76 @@ app.get('/classrooms', function (req,res){
 });
 
 
+	//*****************************************
+	//
+	// 		GENERIC APIs FOR THE FLOOR
+	//		For project by Viniyata and Mathura
+	//
+	//*****************************************
+
+	//*****************************************
+	//
+	// 		/floordata_itp
+	//		IP : 'from_time' from when data is required
+	//			'to_time' is always the prev minute
+	//		OP : Room name
+	//				energy per room
+	//				Total floor energy
+	//
+	//*****************************************
+	app.get('/classrooms1', function (req,res){
+
+		var apiClient = c.apiCall('/api/client/', function (apiClient){
+
+			var clientInfo = JSON.parse(apiClient);
+			console.log(clientInfo);
+			var location = clientInfo[0].locations[0];
+			console.log(location);
+			if(req.query.startTime)
+				{
+					var startTime = req.query.startTime;
+					var startTimeFormatted = startTime.toString().substring(0,19)+'Z';
+					var endTime = moment().format();
+					var endTimeFormatted = endTime.toString().substring(0,19)+'Z';
+					console.log('The time range is -- ' + startTimeFormatted + ' -- ' + endTimeFormatted );
+					floorObject.getFloorOverAllEnergy(startTimeFormatted, endTimeFormatted, location,c,res);
+
+				}
+
+
+
+	//res.send('hi');
+
+		// var locationId;
+		// var apiClient = c.apiCall('/api/client/', function (apiClient){
+		// 	if(apiClient)
+		// 	{
+		// 	var clientInfo = JSON.parse(apiClient);
+		// 	if(clientInfo.locations[0])
+		// 		{
+		// 		console.log(clientInfo);
+		// 		locationId = clientInfo.locations[0];
+		// 		console.log(locationId);
+		// 		}
+		// 	}
+		//
+		// 	if(req.query.startTime)
+		// 	{
+		// 		var startTime = req.query.startTime;
+		// 		var startTimeFormatted = startTime.toString().substring(0,19)+'Z';
+		// 		var endTime = moment().format();
+		// 		var endTimeFormatted = endTime.toString().substring(0,19)+'Z';
+		// 		console.log('The time range is -- ' + startTimeFormatted + ' -- ' + endTimeFormatted );
+		//
+		// 	}
+		// 	res.send('hi');
+
+		});
+	});
 
 
 // Start our server
-var server = app.listen(process.env.PORT || 5000, function () {
+var server = app.listen(5000, function () {
 	var host = server.address().address;
 	var port = server.address().port;
 	console.log('app listening at http://%s:%s', host, port);
