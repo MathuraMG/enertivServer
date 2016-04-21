@@ -1,3 +1,18 @@
+/******************************************************
+FILE CONTAINS ALL THE ENDPOINTS POSSIBLE
+Endpoints are explained above their definition
+
+Available endpoints -
+/login
+/kitchen
+/shop
+/physcomp
+/classrooms
+/floordata_itp
+
+created 15 Apr 2016 by Mathura MG
+******************************************************/
+
 var express = require('express');
 var moment = require('moment');
 var client1 = require('./client.js');
@@ -55,7 +70,7 @@ app.get('/login', function (req,res){
 
 
 //*****************************************
-// ROOMS THAT ARE PRESENT BELOW
+// ROOMS THAT ARE PRESENT BELOW - get data for last 24 hours
 //  1) KITCHEN
 //  2) SHOP
 //  3) PCOMP
@@ -173,7 +188,8 @@ app.get('/classrooms', function (req,res){
 //
 // 		/floordata_itp
 //		IP : 'from_time' from when data is required
-//			'to_time' is always the prev minute
+//					'sublocationId' not compulsory
+//					'equipmentId' not compulsory
 //		OP : Room name
 //				energy per room
 //				Total floor energy

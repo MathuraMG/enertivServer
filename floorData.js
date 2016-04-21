@@ -1,7 +1,8 @@
-var moment = require('moment');
 /******************************************************
 FILE TO GET THE DATA ON ITP FLOOR GIVEN A TIME RANGE
+created 20 Apr 2016 by Mathura MG
 ******************************************************/
+
 // Depending on the time entered by the person, the api will call the proper time intervals
 // if <= 2 days - run in minutes only
 // if > 2 days and <= 7 days - run in 15 min + min
@@ -17,6 +18,11 @@ FILE TO GET THE DATA ON ITP FLOOR GIVEN A TIME RANGE
 // 'min' is peaceful.
 
 //What does apiDuration variable indicate?
+//apiDuration is a variable that indicates what time interval the power data is returned at.
+//This allows in easy calculation of energy.
+
+var moment = require('moment');
+
 var durationDay = 24;
 var durationHour = 1;
 var duration15Min = 0.25;
