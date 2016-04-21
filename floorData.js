@@ -16,10 +16,22 @@ FILE TO GET THE DATA ON ITP FLOOR GIVEN A TIME RANGE
 // ADDITIONAL Caveat - Although 15 min runs from the start time, it WILL NOT give data unless it starts at 00,15,30,45
 // 'min' is peaceful.
 
+//What does apiDuration variable indicate?
+var durationDay = 24;
+var durationHour = 1;
+var duration15Min = 0.25;
+var duration1Min = 0.0166667;
+
+var noComplete;
+var totalEnergy = 0;
+fullRoomData = [];
+
 module.exports = {
 
-  getFloorOverAllEnergy: function(startTime, endTime, locationId,c,res)
+
+  getFloorData: function(startTime, endTime, idForAPI,c,res, apiType,noOfAPICompleted)
   {
+    var that = this;
     console.log('in here -- getting floor data');
 
     var startTimeFormatted = startTime.toString().substring(0,19)+'Z';
@@ -41,12 +53,18 @@ module.exports = {
     *****************************************/
     if(minDiff <= 2880)
     {
-      var detailOfRoomUrl = '/api/location/' + locationId + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=min&cost=false';
+      fullRoomData = [];
+      noComplete = 0;
+      totalEnergy = 0;
+      var detailOfRoomUrl = [];
+      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=min&cost=false';
       //
-      var roomData = c.apiCall(detailOfRoomUrl, function(roomData){
-        //console.log(roomData);
-        res.send(roomData);
-    	});
+      var apiDuration = [duration1Min];
+
+      for(var i=0;i<detailOfRoomUrl.length;i++)
+      {
+        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted);
+      }
     }
     /*****************************************
     if > 2 days and <= 7 days - run in 15 min + min
@@ -54,13 +72,14 @@ module.exports = {
     else if(minDiff > 2880 && minDiff<=10080 )
     {
       var detailOfRoomUrl = [];
-      var fullRoomData = [];
+      fullRoomData = [];
       var roomData ;
-      var noComplete = 0;
+      noComplete = 0;
       var orgStartTime = startTime;
       var orgStartTimeFormatted = orgStartTime.toISOString().substring(0,19)+'Z'
       var orgEndTime = endTime;
-      var orgEndTimeFormatted = orgEndTime.toISOString().substring(0,19)+'Z'
+      var orgEndTimeFormatted = orgEndTime.toISOString().substring(0,19)+'Z';
+      totalEnergy = 0;
 
       // data in 15 min
       var minTemp = startTime.get('minute');
@@ -107,55 +126,35 @@ module.exports = {
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
-      detailOfRoomUrl[0] = '/api/location/' + locationId + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=15min&cost=false';
+      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=15min&cost=false';
 
       //data in 1 min for the beginning data
-      detailOfRoomUrl[1] = '/api/location/' + locationId + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
 
       //data in 1 min for the trailing data
-      detailOfRoomUrl[2] = '/api/location/' + locationId + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+
+      var apiDuration = [duration15Min, duration1Min, duration1Min];
+
       for(var i=0;i<detailOfRoomUrl.length;i++)
       {
-        roomData = c.apiCall(detailOfRoomUrl[i], function(roomData){
-          //console.log(roomData);
-          noComplete++;
-          fullRoomData.push(roomData);
-          //res.send(roomData);
-          if(noComplete == detailOfRoomUrl.length)
-          {
-            var a = JSON.parse(fullRoomData[0]);
-            var b = JSON.parse(fullRoomData[1]);
-            var c = JSON.parse(fullRoomData[2]);
-            //console.log(a.data);
-            a.data = a.data.concat(b.data);
-            a.data = a.data.concat(c.data);
-
-            res.send(a);
-          }
-          else
-          {
-
-          }
-      	});
-
+        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
       }
-
-
     }
     /*****************************************
-    if > 7 days and <= 100 days - run in hours +  min
+    if > 7 days and <= 30 days - run in hours +  min
     *****************************************/
-    else if(hourDiff > 168 && hourDiff <= 2400 )
+    else if(hourDiff > 168 && hourDiff <= 720 )
     {
       var detailOfRoomUrl = [];
-      var fullRoomData = [];
+      fullRoomData = [];
       var roomData ;
-      var noComplete = 0;
+      noComplete = 0;
       var orgStartTime = startTime;
       var orgStartTimeFormatted = orgStartTime.toISOString().substring(0,19)+'Z';
       var orgEndTime = endTime;
       var orgEndTimeFormatted = orgEndTime.toISOString().substring(0,19)+'Z';
-
+      var totalEnergy = 0;
       // data in hours min
       var minTemp = startTime.get('minute');
       if(minTemp>0)
@@ -177,56 +176,37 @@ module.exports = {
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
-      detailOfRoomUrl[0] = '/api/location/' + locationId + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=hour&cost=false';
+      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=hour&cost=false';
 
       //data in 1 min for the beginning data
-      detailOfRoomUrl[1] = '/api/location/' + locationId + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
 
       //data in 1 min for the trailing data
-      detailOfRoomUrl[2] = '/api/location/' + locationId + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+
+      var apiDuration = [durationHour, duration1Min, duration1Min];
       for(var i=0;i<detailOfRoomUrl.length;i++)
       {
-        roomData = c.apiCall(detailOfRoomUrl[i], function(roomData){
-          //console.log(roomData);
-          noComplete++;
-          fullRoomData.push(roomData);
-          //res.send(roomData);
-          if(noComplete == detailOfRoomUrl.length)
-          {
-            var a = JSON.parse(fullRoomData[0]);
-            var b = JSON.parse(fullRoomData[1]);
-            var c = JSON.parse(fullRoomData[2]);
-            //console.log(a.data);
-            a.data = a.data.concat(b.data);
-            a.data = a.data.concat(c.data);
-
-            res.send(a);
-          }
-          else
-          {
-
-          }
-      	});
+        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
       }
     }
     /*****************************************
-      if > 100 days and <= 1 yr - run in days and then hours and minutes
+      if > 30 days and <= 1 yr - run in days and then hours and minutes
     *****************************************/
-    else if(hourDiff > 2400 && hourDiff <= 45260 )
+    else if(hourDiff > 720 && hourDiff <= 45260 )
     {
       var detailOfRoomUrl = [];
-      var fullRoomData = [];
+      fullRoomData = [];
       var roomData ;
-      var noComplete = 0;
+      noComplete = 0;
       var orgStartTime = startTime;
       var orgStartTimeFormatted = orgStartTime.toISOString().substring(0,19)+'Z';
       var orgEndTime = endTime;
       var orgEndTimeFormatted = orgEndTime.toISOString().substring(0,19)+'Z';
       var hourStartTime = startTime;
       var hourEndTime = endTime;
-
-
       var minTemp = startTime.get('minute');
+      var totalEnergy = 0;
 
       if(minTemp>0)
       {
@@ -234,7 +214,6 @@ module.exports = {
         startTime.add(1, 'hour');
         startTime.minutes(0);
         console.log('test -- ' + startTime);
-
       }
 
       minTemp = endTime.get('minute');
@@ -251,10 +230,10 @@ module.exports = {
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
       //data in 1 min for the beginning data
-      detailOfRoomUrl[3] = '/api/location/' + locationId + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[3] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
 
       //data in 1 min for the trailing data
-      detailOfRoomUrl[4] = '/api/location/' + locationId + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+      detailOfRoomUrl[4] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
 
       hourTemp = startTime.get('hour');
       if(hourTemp>0)
@@ -279,44 +258,19 @@ module.exports = {
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
-
-
       //data in days for the data
-      detailOfRoomUrl[0] = '/api/location/' + locationId + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=day&cost=false';
+      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=day&cost=false';
 
       //data in hours for the beginning data
-      detailOfRoomUrl[1] = '/api/location/' + locationId + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=hour&cost=false';
+      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=hour&cost=false';
 
       //data in hours for the trailing data
-      detailOfRoomUrl[2] = '/api/location/' + locationId + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=hour&cost=false';
+      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=hour&cost=false';
 
-
+      var apiDuration = [durationDay,durationHour,durationHour, duration1Min, duration1Min];
       for(var i=0;i<detailOfRoomUrl.length;i++)
       {
-        roomData = c.apiCall(detailOfRoomUrl[i], function(roomData){
-          noComplete++;
-          fullRoomData.push(roomData);
-          //res.send(roomData);
-          if(noComplete == detailOfRoomUrl.length)
-          {
-            var a = JSON.parse(fullRoomData[0]);
-            var b = JSON.parse(fullRoomData[1]);
-            var c = JSON.parse(fullRoomData[2]);
-            var d = JSON.parse(fullRoomData[3]);
-            var e = JSON.parse(fullRoomData[4]);
-            //console.log(a.data);
-            a.data = a.data.concat(b.data);
-            a.data = a.data.concat(c.data);
-            a.data = a.data.concat(d.data);
-            a.data = a.data.concat(e.data);
-
-            res.send(a);
-          }
-          else
-          {
-
-          }
-      	});
+        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
       }
     }
 
@@ -324,17 +278,55 @@ module.exports = {
     {
       res.send(1);
     }
+  },
+
+
+
+  getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted) {
+    var that = this;
+
+    roomData = c.apiCall(url, function(roomData){
+      noComplete++;
+      fullRoomData.push(roomData);
+      console.log(url);
+      // console.log(roomData);
+      console.log('no complete -- ' + noComplete + ' -- no of url -- ' + noOfUrl);
+      // console.log(JSON.parse(roomData));
+      totalEnergy += that.calculateEnergy(JSON.parse(roomData).data,apiDuration);
+
+      if(noComplete == noOfUrl)
+      {
+        var a = JSON.parse(fullRoomData[0]);
+        for(var i=1;i<noOfUrl;i++)
+        {
+          var temp = JSON.parse(fullRoomData[i]);
+          a.data = a.data.concat(temp.data);
+        }
+        noOfAPICompleted++;
+        console.log('check chekc -- '+noOfAPICompleted);
+        var temp = {
+          "data" : a,
+          "totalEnergy" : totalEnergy};
+
+        res.send(temp);
+      }
+      else
+      {}
+    });
+  },
+
+
+
+  calculateEnergy: function(data,apiDuration) {
+    var total = 0;
+    var keyName =  Object.keys(data[0])[1];
+    console.log(('keyname is -- ' + keyName));
+    for(var i =0;i<data.length;i++){
+      total += (data[i][keyName]);
+    }
+    total = total*apiDuration;
+    console.log('total energy is -- ' + total );
+    return total;
   }
-};
 
-
-/****************
-sa= moment.utc(new Date('2016-04-15T23:41:18Z'));
-a = a.toISOString();
-//a = a.get('hour');
-//a = a.add(1,'hour');
-
-//a = a.get('minute');
-document.getElementById('hi').innerHTML = a;
-
- ***************/
+}

@@ -7,6 +7,12 @@ var equipmentObject = require('./equipment.js');
 //FILE TO GET THE DATA ON ITP FLOOR GIVEN A TIME RANGE
 var floorObject = require('./floorData.js');
 
+var https = require('https');
+var http = require('http');
+
+https.globalAgent.maxSockets = 10;
+http.globalAgent.maxSockets = 10;
+
 var app = express();
 var c = new client1;
 
@@ -163,36 +169,58 @@ app.get('/classrooms', function (req,res){
 	//
 	//*****************************************
 
-	//*****************************************
-	//
-	// 		/floordata_itp
-	//		IP : 'from_time' from when data is required
-	//			'to_time' is always the prev minute
-	//		OP : Room name
-	//				energy per room
-	//				Total floor energy
-	//
-	//*****************************************
-	app.get('/floordata_itp', function (req,res){
+//*****************************************
+//
+// 		/floordata_itp
+//		IP : 'from_time' from when data is required
+//			'to_time' is always the prev minute
+//		OP : Room name
+//				energy per room
+//				Total floor energy
+//
+//*****************************************
+app.get('/floordata_itp', function (req,res){
 
-		var apiClient = c.apiCall('/api/client/', function (apiClient){
+	var apiClient = c.apiCall('/api/client/', function (apiClient){
 
-			var clientInfo = JSON.parse(apiClient);
-			console.log(clientInfo);
-			var location = clientInfo[0].locations[0];
-			console.log(location);
-			if(req.query.startTime)
-				{
-					var startTime = req.query.startTime;
-					var endTime = moment().format();
-					console.log('The time range is -- ' + startTime+ ' -- ' + endTime );
-					floorObject.getFloorOverAllEnergy(startTime, endTime, location,c,res);
+		var clientInfo = JSON.parse(apiClient);
+		console.log(clientInfo);
+		var location = clientInfo[0].locations[0];
+		console.log(location);
+		var noOfAPICompleted;
+		var startTime;
+		var endTime;
+		var apiType;
+		var roomsInFloorDataURL
 
-				}
+		if(req.query.startTime)
+		{
+			noOfAPICompleted = 0;
+			startTime = req.query.startTime;
+			endTime = moment().format();
 
-		});
+			if(req.query.equipmentId)
+			{
+				apiType='equipment';
+				idForAPI = req.query.equipmentId;
+			}
+			else if(req.query.sublocationId)
+			{
+				apiType = 'sublocation';
+				idForAPI = req.query.sublocationId;
+			}
+			else
+			{
+				apiType = 'location';
+				idForAPI = location;
+			}
+
+			dataReturnedFromAPI = floorObject.getFloorData(startTime, endTime, idForAPI,c,res,apiType,noOfAPICompleted);
+
+
+		}
 	});
-
+});
 
 // Start our server
 var server = app.listen(5000, function () {
