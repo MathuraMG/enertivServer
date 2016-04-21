@@ -27,3 +27,5 @@ Total Energy in given time period
 http://localhost:5000/floordata_itp?startTime=2016-04-20T21:41:18&equipmentId=db954f1c-7602-45c9-85ae-55d555dced75
 http://localhost:5000/floordata_itp?startTime=2016-04-20T21:41:18&sublocationId=ce007293-7a34-4a61-80a1-d92312e6cfa9
 http://localhost:5000/floordata_itp?startTime=2016-04-20T21:41:18
+
+The original clientjs code was developed by John Farell and can be found here - https://github.com/jefarrell/EnertivAPI
