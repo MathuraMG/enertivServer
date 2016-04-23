@@ -102,7 +102,8 @@ module.exports = {
       //console.log(parsedData);
       if(parsedData.data.length>0)
       {
-    		var keyName =  Object.keys(parsedData.data[0])[1];
+    		var keyName = Object.keys(parsedData.data[0])[1];
+        var timeVar = Object.keys(parsedData.data[0])[0];
 
         if(keyName.localeCompare('x') == 0 )
         {
@@ -118,7 +119,7 @@ module.exports = {
           console.log('data length is -- ' + parsedData.data.length);
           for(var i =0;i<parsedData.data.length;i++)
           {
-            equipmentEnergy[i] = {x:i,y:parsedData.data[i][keyName]*1000};
+            equipmentEnergy[i] = {x:parsedData.data[i][timeVar],y:parsedData.data[i][keyName]*1000};
             if(isDay ==1)
             {
               if(i>= changeStart && i< changeEnd)
@@ -145,7 +146,7 @@ module.exports = {
 
             if(!totalRoomEnergy[i])
             {
-              totalRoomEnergy[i] = {x:i,y:parsedData.data[i][keyName]*1000};
+              totalRoomEnergy[i] = {x:parsedData.data[i][timeVar],y:parsedData.data[i][keyName]*1000};
             }
             else
             {
