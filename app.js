@@ -62,10 +62,23 @@ var equipData = [];
 
 // Hit this first to authenticate and get current data
 app.get('/login', function (req,res){
-	var data = c.login(function (data){
-		console.log("YOU ARE AUTHENTICATED");
-		res.send(data);
-	});
+	if(req.query.loginId)
+	{
+		console.log('login is -- ' + req.query.loginId);
+		if(!req.query.loginId.localeCompare('potato12'))
+		{
+			var data = c.login(function (data){
+				console.log("YOU ARE AUTHENTICATED");
+				res.send(data);
+			});
+		}
+		else{
+			res.send('YOU ARE NOT AUTHORIZED');
+		}
+	}
+	else{
+		res.send('YOU ARE NOT AUTHORIZED');
+	}
 });
 
 
@@ -167,10 +180,10 @@ app.get('/classrooms', function (req,res){
 		var conferenceRoomLocationId = '4b6a1f2e-b40d-4cc6-8119-217259a75249';
 
 		var locations = [room20LocationId,
-															room15LocationId,
-															room50LocationId,
-															meetingRoomLocationId,
-															conferenceRoomLocationId]
+										room15LocationId,
+										room50LocationId,
+										meetingRoomLocationId,
+										conferenceRoomLocationId]
 		equipmentObject.getEquipmentFromLocations(locations,res,c);
 
 	});
@@ -233,10 +246,11 @@ app.get('/floordata_itp', function (req,res){
 
 			dataReturnedFromAPI = floorObject.getFloorData(startTime, endTime, idForAPI,c,res,apiType,noOfAPICompleted);
 
-
 		}
 	});
 });
+
+
 
 // Start our server
 var server = app.listen(process.env.PORT || 5000, function () {

@@ -19,7 +19,7 @@ created 20 Apr 2016 by Mathura MG
 
 //What does apiDuration variable indicate?
 //apiDuration is a variable that indicates what time interval the power data is returned at.
-//This allows in easy calculation of energy.
+//This allows in easy calculation of energy
 
 var moment = require('moment');
 
@@ -285,8 +285,6 @@ module.exports = {
       res.send(1);
     }
   },
-
-
 
   getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted) {
     var that = this;
