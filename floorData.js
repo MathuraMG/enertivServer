@@ -37,6 +37,7 @@ module.exports = {
 
   getFloorData: function(startTime, endTime, idForAPI,c,res, apiType,noOfAPICompleted)
   {
+    var totalData = [];
     var that = this;
     console.log('in here -- getting floor data');
 
@@ -62,14 +63,17 @@ module.exports = {
       fullRoomData = [];
       noComplete = 0;
       totalEnergy = 0;
+      noOfAPICompleted = 0;
       var detailOfRoomUrl = [];
-      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=min&cost=false';
-      //
-      var apiDuration = [duration1Min];
-
-      for(var i=0;i<detailOfRoomUrl.length;i++)
+      for(var a =0; a<idForAPI.length;a++)
       {
-        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted);
+        detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=min&cost=false';
+
+        var apiDuration = [duration1Min];
+        for(var i=0;i<detailOfRoomUrl.length;i++)
+        {
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+        }
       }
     }
     /*****************************************
@@ -132,19 +136,21 @@ module.exports = {
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
-      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=15min&cost=false';
-
-      //data in 1 min for the beginning data
-      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
-
-      //data in 1 min for the trailing data
-      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
-
-      var apiDuration = [duration15Min, duration1Min, duration1Min];
-
-      for(var i=0;i<detailOfRoomUrl.length;i++)
+      for(var a =0; a<idForAPI.length;a++)
       {
-        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
+        detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=15min&cost=false';
+
+        //data in 1 min for the beginning data
+        detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
+
+        //data in 1 min for the trailing data
+        detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+
+        var apiDuration = [duration15Min, duration1Min, duration1Min];
+        for(var i=0;i<detailOfRoomUrl.length;i++)
+        {
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+        }
       }
     }
     /*****************************************
@@ -181,19 +187,21 @@ module.exports = {
       console.log(' -- ' + startTimeFormatted + ' -- ' + endTimeFormatted + ' -- ');
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
-
-      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=hour&cost=false';
-
-      //data in 1 min for the beginning data
-      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
-
-      //data in 1 min for the trailing data
-      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
-
-      var apiDuration = [durationHour, duration1Min, duration1Min];
-      for(var i=0;i<detailOfRoomUrl.length;i++)
+      for(var a =0; a<idForAPI.length;a++)
       {
-        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
+        detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=hour&cost=false';
+
+        //data in 1 min for the beginning data
+        detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
+
+        //data in 1 min for the trailing data
+        detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+
+        var apiDuration = [durationHour, duration1Min, duration1Min];
+        for(var i=0;i<detailOfRoomUrl.length;i++)
+        {
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+        }
       }
     }
     /*****************************************
@@ -230,16 +238,14 @@ module.exports = {
 
       var endTimeFormatted = endTime.toISOString().substring(0,19)+'Z';
       var startTimeFormatted = startTime.toISOString().substring(0,19)+'Z';
+      var tempEndTimeFormatted = String(endTimeFormatted);
+      var tempStartTimeFormatted = String(startTimeFormatted);
 
-      console.log(' -- ' + startTimeFormatted + ' -- ' + endTimeFormatted + ' -- ');
-      console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
-      console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
+      console.log(' -- ' + tempStartTimeFormatted + ' -- ' + tempEndTimeFormatted + ' -- ');
+      console.log(' -- ' + orgStartTimeFormatted + ' -- ' + tempStartTimeFormatted + ' -- ');
+      console.log(' -- ' + tempEndTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
 
-      //data in 1 min for the beginning data
-      detailOfRoomUrl[3] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=min&cost=false';
 
-      //data in 1 min for the trailing data
-      detailOfRoomUrl[4] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
 
       hourTemp = startTime.get('hour');
       if(hourTemp>0)
@@ -263,20 +269,29 @@ module.exports = {
       console.log(' -- ' + startTimeFormatted + ' -- ' + endTimeFormatted + ' -- ');
       console.log(' -- ' + orgStartTimeFormatted + ' -- ' + startTimeFormatted + ' -- ');
       console.log(' -- ' + endTimeFormatted + ' -- ' + orgEndTimeFormatted + ' -- ' );
+      for(var a =0; a<idForAPI.length;a++)
+      {
 
       //data in days for the data
-      detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=day&cost=false';
+        detailOfRoomUrl[0] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + startTimeFormatted +'&toTime='+ endTimeFormatted + '&interval=day&cost=false';
 
-      //data in hours for the beginning data
-      detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=hour&cost=false';
+        //data in hours for the beginning data
+        detailOfRoomUrl[1] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ startTimeFormatted + '&interval=hour&cost=false';
 
-      //data in hours for the trailing data
-      detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=hour&cost=false';
+        //data in hours for the trailing data
+        detailOfRoomUrl[2] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + endTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=hour&cost=false';
 
-      var apiDuration = [durationDay,durationHour,durationHour, duration1Min, duration1Min];
-      for(var i=0;i<detailOfRoomUrl.length;i++)
-      {
-        that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res);
+        //data in 1 min for the beginning data
+        detailOfRoomUrl[3] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ tempStartTimeFormatted + '&interval=min&cost=false';
+
+        //data in 1 min for the trailing data 
+        detailOfRoomUrl[4] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + tempEndTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
+
+        var apiDuration = [durationDay,durationHour,durationHour, duration1Min, duration1Min];
+        for(var i=0;i<detailOfRoomUrl.length;i++)
+        {
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+        }
       }
     }
 
@@ -286,33 +301,45 @@ module.exports = {
     }
   },
 
-  getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted) {
+  getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted,totalData,apiIndex,totalNoOfId) {
     var that = this;
+    totalData[apiIndex] = [];
 
     roomData = c.apiCall(url, function(roomData){
       noComplete++;
+      console.log('apiIndex is -- ' + apiIndex);
+      console.log(fullRoomData);
       fullRoomData.push(roomData);
+      totalData[apiIndex].push(roomData);
       console.log(url);
-      // console.log(roomData);
+
       console.log('no complete -- ' + noComplete + ' -- no of url -- ' + noOfUrl);
-      // console.log(JSON.parse(roomData));
-      totalEnergy += that.calculateEnergy(JSON.parse(roomData).data,apiDuration);
 
-      if(noComplete == noOfUrl)
+
+      var tempTotalData = [];
+      if(noComplete == noOfUrl*totalNoOfId)
       {
-        var a = JSON.parse(fullRoomData[0]);
-        for(var i=1;i<noOfUrl;i++)
-        {
-          var temp = JSON.parse(fullRoomData[i]);
-          a.data = a.data.concat(temp.data);
+        console.log(' no of calls complete -- ' + noComplete);
+        console.log(totalData);
+        for(var j =0;j<totalData.length;j++)
+        { totalEnergy = 0;
+          totalEnergy += that.calculateEnergy(JSON.parse(totalData[j][0]).data,apiDuration);
+          var a = JSON.parse(totalData[j][0]);
+          for(var i=1;i<noOfUrl;i++)
+          {
+            var temp = JSON.parse(totalData[j][i]);
+            a.data = a.data.concat(temp.data);
+            totalEnergy += that.calculateEnergy(JSON.parse(totalData[j][i]).data,apiDuration);
+          }
+          noOfAPICompleted++;
+          console.log('check check -- '+noOfAPICompleted);
+          tempTotalData[j] = {
+            "data" : a,
+            "totalEnergy" : totalEnergy
+          };
         }
-        noOfAPICompleted++;
-        console.log('check chekc -- '+noOfAPICompleted);
-        var temp = {
-          "data" : a,
-          "totalEnergy" : totalEnergy};
 
-        res.send(temp);
+        res.send(tempTotalData);
       }
       else
       {}
@@ -320,9 +347,12 @@ module.exports = {
   },
 
 
-
   calculateEnergy: function(data,apiDuration) {
     var total = 0;
+
+    console.log('calculating the energy');
+    console.log(data);
+
     var keyName =  Object.keys(data[0])[1];
     console.log(('keyname is -- ' + keyName));
     for(var i =0;i<data.length;i++){

@@ -65,8 +65,10 @@ app.get('/login', function (req,res){
 	if(req.query.loginId)
 	{
 		console.log('login is -- ' + req.query.loginId);
-		if(!req.query.loginId.localeCompare('potato12'))
+			console.log(process.env.ENERTIV_PERSONAL_PASSWORD);
+		if(!req.query.loginId.localeCompare( process.env.ENERTIV_PERSONAL_PASSWORD))
 		{
+
 			var data = c.login(function (data){
 				console.log("YOU ARE AUTHENTICATED");
 				res.send(data);
@@ -231,17 +233,23 @@ app.get('/floordata_itp', function (req,res){
 			if(req.query.equipmentId)
 			{
 				apiType='equipment';
-				idForAPI = req.query.equipmentId;
+				idForAPI = req.query.equipmentId.split(',');;
 			}
 			else if(req.query.sublocationId)
 			{
 				apiType = 'sublocation';
-				idForAPI = req.query.sublocationId;
+				console.log("MAAATTTHHHHUUURAAA");
+				console.log(req.query.sublocationId);
+				console.log("MAAATTTHHHHUUURAAA");
+				idForAPI = req.query.sublocationId.split(',');
+				console.log(idForAPI);
+				console.log(idForAPI[0]);
+				console.log(idForAPI[1]);
 			}
 			else
 			{
 				apiType = 'location';
-				idForAPI = location;
+				idForAPI = [location];
 			}
 
 			dataReturnedFromAPI = floorObject.getFloorData(startTime, endTime, idForAPI,c,res,apiType,noOfAPICompleted);

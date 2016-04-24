@@ -4,17 +4,18 @@ A custom-made enertiv server to get the required data from enertiv into a phoneg
 
 ##List of API
 
-#### /login
+#### /login?loginId=
 
 Need to go into this at the start of any session
+requires a loginId, please mail mmg542@nyu.edu if you would like access to these APIs
 
 #### /floordata_itp
 
 ######Inputs
 
 startTime - this need to be in the following format - 2016-04-20T21:41:18 - this is a compulsory ip
-sublocationid - this can be the id of a specific room - not compulsory
-equipmentId - this can be the id of a specific equipment - not compulsory
+sublocationid - this can be the id of a specific room - not compulsory ( comma separated if you are sending multiple ids )
+equipmentId - this can be the id of a specific equipment - not compulsory ( comma separated if you are sending multiple ids )
 if equipmentId and subocationId are not present, it will automatically give floor numbers.
 
 ######Output
