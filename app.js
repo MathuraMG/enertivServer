@@ -258,6 +258,32 @@ app.get('/floordata_itp', function (req,res){
 	});
 });
 
+//*****************************************
+//
+// 		/schema_itp
+//		IP : NONE
+//		OP : sublocation
+//				 equipments in sublocation
+//
+//*****************************************
+app.get('/schema_itp', function (req,res){
+
+	var apiClient = c.apiCall('/api/client/', function (apiClient){
+
+		var clientInfo = JSON.parse(apiClient);
+		console.log(clientInfo);
+		var location = clientInfo[0].locations[0];
+		console.log(location);
+
+		var url = '/api/location/' + location + '/sublocation/'
+
+		var schema = c.apiCall(url, function(schema){
+			res.send(schema);
+		});
+	});
+});
+
+
 
 
 // Start our server

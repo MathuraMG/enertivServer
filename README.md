@@ -30,3 +30,19 @@ http://localhost:5000/floordata_itp?startTime=2016-04-20T21:41:18&sublocationId=
 http://localhost:5000/floordata_itp?startTime=2016-04-20T21:41:18
 
 The original clientjs code was developed by John Farell and can be found here - https://github.com/jefarrell/EnertivAPI
+
+#### /schema_itp
+
+######Inputs
+
+None
+
+######Output
+
+Returns object that contains rooms in ITP and their equipment. Eg -
+    id: "756fbd3e-066f-405e-b133-508fc5f18e85",
+    parent_sublocation: "cb4d8d3f-c476-4216-9292-43d45610c027",
+    name: "Room 448",
+    equipments: [
+    "e0d808ad-7240-4da3-b8da-779c108d8378"
+    ]
