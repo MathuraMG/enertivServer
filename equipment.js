@@ -70,8 +70,8 @@ module.exports = {
   getEquipmentData: function(index, equipmentId, c, equipmentResponse, noOfEquipments,res, startTimeFormatted, endTimeFormatted, totalRoomEnergy)
   {
     var currTime = new Date();
-    var currentHour = currTime.getHours();
-    var currentMinute = currTime.getMinutes();
+    var currentHour = currTime.getUTCHours();
+    var currentMinute = currTime.getUTCMinutes();
 
     var diff;
     var changeStart;
