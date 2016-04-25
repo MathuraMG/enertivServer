@@ -79,6 +79,11 @@ module.exports = {
     var changeDur;
     var isDay;
 
+    currentHour = (currentHour -4)%24;
+    if(currentHour<0)
+    {
+      currentHour = currentHour+24;
+    }
 
 
     if(currentHour >= 9 && currentHour <= 24 )
