@@ -79,6 +79,8 @@ module.exports = {
     var changeDur;
     var isDay;
 
+
+
     if(currentHour >= 9 && currentHour <= 24 )
     {
       isDay = 1;
@@ -124,11 +126,12 @@ module.exports = {
             {
               if(i>= changeStart && i< changeEnd)
               {
-                totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+                totalEnergyOffPeak += parsedData.data[i][keyName]*1000/60;
+
               }
               else
               {
-                totalEnergyPeak += parsedData.data[i][keyName]*1000;
+                totalEnergyPeak += parsedData.data[i][keyName]*1000/60;
               }
             }
             else
@@ -136,11 +139,11 @@ module.exports = {
 
               if(i>= changeStart && i< changeEnd)
               {
-                totalEnergyPeak += parsedData.data[i][keyName]*1000;
+                totalEnergyPeak += parsedData.data[i][keyName]*1000/60;
               }
               else
               {
-                totalEnergyOffPeak += parsedData.data[i][keyName]*1000;
+                totalEnergyOffPeak += parsedData.data[i][keyName]*1000/60;
               }
             }
 
@@ -164,8 +167,15 @@ module.exports = {
 
       if(equipmentResponse.length == noOfEquipments-1)
       {
+
         var totalRoomEnergyPeak = 0;
         var totalRoomEnergyOffPeak = 0;
+        for(var i =0;i<equipmentResponse.length;i++)
+        {
+          totalRoomEnergyPeak += equipmentResponse[i].totalEnergyPeak;
+          totalRoomEnergyOffPeak += equipmentResponse[i].totalEnergyOffPeak;
+        }
+
         equipmentResponse.push({name:'roomTotal',value: totalRoomEnergy,totalEnergyOffPeak: totalRoomEnergyOffPeak, totalEnergyPeak: totalRoomEnergyPeak});
 
         res.send({
