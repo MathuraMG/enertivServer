@@ -38,6 +38,7 @@ module.exports = {
   getFloorData: function(startTime, endTime, idForAPI,c,res, apiType,noOfAPICompleted)
   {
     var totalData = [];
+    var roomIds = [];
     var that = this;
     console.log('in here -- getting floor data');
 
@@ -72,7 +73,7 @@ module.exports = {
         var apiDuration = [duration1Min];
         for(var i=0;i<detailOfRoomUrl.length;i++)
         {
-          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length,idForAPI[a],roomIds);
         }
       }
     }
@@ -149,7 +150,7 @@ module.exports = {
         var apiDuration = [duration15Min, duration1Min, duration1Min];
         for(var i=0;i<detailOfRoomUrl.length;i++)
         {
-          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length,idForAPI[a],roomIds);
         }
       }
     }
@@ -200,7 +201,7 @@ module.exports = {
         var apiDuration = [durationHour, duration1Min, duration1Min];
         for(var i=0;i<detailOfRoomUrl.length;i++)
         {
-          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length,idForAPI[a],roomIds);
         }
       }
     }
@@ -284,13 +285,16 @@ module.exports = {
         //data in 1 min for the beginning data
         detailOfRoomUrl[3] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + orgStartTimeFormatted +'&toTime='+ tempStartTimeFormatted + '&interval=min&cost=false';
 
-        //data in 1 min for the trailing data 
+        //data in 1 min for the trailing data
         detailOfRoomUrl[4] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + tempEndTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
 
+        var idid = idForAPI[a];
+        console.log('MATHURA*************' + idid + ' -- ' + idForAPI[a]);
         var apiDuration = [durationDay,durationHour,durationHour, duration1Min, duration1Min];
         for(var i=0;i<detailOfRoomUrl.length;i++)
         {
-          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length);
+
+          that.getPowerEnergyNumbers(detailOfRoomUrl[i], apiDuration[i],c, detailOfRoomUrl.length,res,noOfAPICompleted,totalData,a,idForAPI.length,idForAPI[a],roomIds);
         }
       }
     }
@@ -301,14 +305,14 @@ module.exports = {
     }
   },
 
-  getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted,totalData,apiIndex,totalNoOfId) {
+  getPowerEnergyNumbers: function( url, apiDuration, c, noOfUrl,res,noOfAPICompleted,totalData,apiIndex,totalNoOfId,id,roomIds) {
     var that = this;
     totalData[apiIndex] = [];
-
+    roomIds[apiIndex] = id;
     roomData = c.apiCall(url, function(roomData){
       noComplete++;
-      console.log('apiIndex is -- ' + apiIndex);
-      console.log(fullRoomData);
+      console.log('apiIndex is -- ' + apiIndex + ' -- '  + id);
+      //console.log(fullRoomData);
       fullRoomData.push(roomData);
       totalData[apiIndex].push(roomData);
       console.log(url);
@@ -320,7 +324,7 @@ module.exports = {
       if(noComplete == noOfUrl*totalNoOfId)
       {
         console.log(' no of calls complete -- ' + noComplete);
-        console.log(totalData);
+        //console.log(totalData);
         for(var j =0;j<totalData.length;j++)
         { totalEnergy = 0;
           totalEnergy += that.calculateEnergy(JSON.parse(totalData[j][0]).data,apiDuration);
@@ -335,7 +339,8 @@ module.exports = {
           console.log('check check -- '+noOfAPICompleted);
           tempTotalData[j] = {
             "data" : a,
-            "totalEnergy" : totalEnergy
+            "totalEnergy" : totalEnergy,
+            "id": roomIds[j]
           };
         }
 
@@ -351,16 +356,18 @@ module.exports = {
     var total = 0;
 
     console.log('calculating the energy');
-    console.log(data);
-
-    var keyName =  Object.keys(data[0])[1];
-    console.log(('keyname is -- ' + keyName));
-    for(var i =0;i<data.length;i++){
-      total += (data[i][keyName]);
+    //console.log(data);
+    if(data.length>0)
+    {
+      var keyName =  Object.keys(data[0])[1];
+      console.log(('keyname is -- ' + keyName));
+      for(var i =0;i<data.length;i++){
+        total += (data[i][keyName]);
+      }
+      total = total*apiDuration;
+      console.log('total energy is -- ' + total );
+      return total;
     }
-    total = total*apiDuration;
-    console.log('total energy is -- ' + total );
-    return total;
   }
 
 }
