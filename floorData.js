@@ -289,7 +289,6 @@ module.exports = {
         detailOfRoomUrl[4] = '/api/'+apiType+'/' + idForAPI[a] + '/data/?fromTime=' + tempEndTimeFormatted +'&toTime='+ orgEndTimeFormatted + '&interval=min&cost=false';
 
         var idid = idForAPI[a];
-        console.log('MATHURA*************' + idid + ' -- ' + idForAPI[a]);
         var apiDuration = [durationDay,durationHour,durationHour, duration1Min, duration1Min];
         for(var i=0;i<detailOfRoomUrl.length;i++)
         {
