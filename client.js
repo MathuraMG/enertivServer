@@ -25,7 +25,7 @@ var https = require('https');
 var querystring = require('querystring');
 var clientData;
 
-// Bring in login information from our cred file
+// Bring in login information from our process env
 var loginData = querystring.stringify({
 	'client_id': process.env.ENERTIV_CLIENT_ID,
 	'client_secret': process.env.ENERTIV_CLIENT_SECRET,
@@ -41,7 +41,7 @@ var options = {
   method: 'POST',
   host: 'api.enertiv.com',
   port: 443,
-  path: '/oauth2/access_token/',
+  path: '/o/token/',
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Content-Length': loginData.length
